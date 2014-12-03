@@ -47,10 +47,10 @@
 	};
     }
     //ie7, ie8 end
-    if(window.defClass === undefined) {
-	window.defClass = function(className, config) {
+    if(exports.defClass === undefined) {
+	exports.defClass = function(className, definition) {
 	    //define util
-	    var constructor, prototype, extend, include
+	    var constructor, prototype, extend, include, prototypeObject
 	    , properties = {}, propertiesMerger = function(properties, merger) {
 		for(var idx in merger) {
 		    properties[idx] = {
@@ -62,13 +62,13 @@
 	    }
 	    , idx;
 	    //constructor
-	    if(config.hasOwnProperty("constructor") && typeof config.constructor === "function") {
-		constructor = config.constructor;
-		delete config.constructor;
+	    if(definition.hasOwnProperty("constructor") && typeof definition.constructor === "function") {
+		constructor = definition.constructor;
+		delete definition.constructor;
 	    }
 	    //extend
-	    if(config.hasOwnProperty("extend") && typeof config.extend === "function") {
-		extend = config.extend;
+	    if(definition.hasOwnProperty("extend") && typeof definition.extend === "function") {
+		extend = definition.extend;
 		prototype = extend.prototype;
 		if(constructor === undefined) {
 		    constructor = eval("var constructor = function " + className + " () { this.parentCall('constructor', arguments); }; constructor;");
@@ -78,7 +78,7 @@
 			constructor[idx] = extend[idx];
 		    }
 		}
-		delete config.extend;
+		delete definition.extend;
 	    } else {
 		if(constructor === undefined) {
 		    constructor = eval("var constructor = function " + className + " () {}; constructor;");
@@ -86,16 +86,16 @@
 		prototype = constructor.prototype;
 	    }
 	    //statics
-	    if(config.hasOwnProperty("statics") && typeof config.statics === "object") {
-		for(idx in config.statics) {
-		    constructor[idx] = config.statics[idx];
+	    if(definition.hasOwnProperty("statics") && typeof definition.statics === "object") {
+		for(idx in definition.statics) {
+		    constructor[idx] = definition.statics[idx];
 		}
-		delete config.statics;
+		delete definition.statics;
 	    }
 	    //instance
 	    //mix-in.instance
-	    if (typeof config.include === "object") {
-		include = config.include;
+	    if (typeof definition.include === "object") {
+		include = definition.include;
 		if(include instanceof Array) {
 		    for(idx in include) {
 			properties = propertiesMerger(properties, include[idx]);
@@ -103,10 +103,10 @@
 		} else {
 		    properties = propertiesMerger(properties, include);
 		}
-		delete config.include;
+		delete definition.include;
 	    }
 	    //public.instance
-	    properties = propertiesMerger(properties, config);
+	    properties = propertiesMerger(properties, definition);
 	    properties.constructor = { value: constructor };
 	    properties.parentCall = {
 		value: function(method, args) {
@@ -118,8 +118,12 @@
 		    }
 		}
 	    }
+	    prototypeObject = Object.create(prototype, properties);
+	    //for nodejs
+	    constructor.prototype = prototypeObject;
+	    //for browser
 	    defineProperty(constructor, 'prototype', {
-		value: Object.create(prototype, properties),
+		value: prototypeObject,
 		writable: false,
 		enumerable: false,
 		configurable: false
@@ -129,7 +133,7 @@
 	}
     }
     
-    return defClass("%s", {
+    return exports.defClass("%s", {
 	%s,
 	
 	constructor: function %s () {},
