@@ -1,7 +1,9 @@
-/**
+    /**
  *
  * @api
- * @var 
+ * @var mixed $%s
+ * @access public
  * @link
  */
-    public $%s = ;
+public $%s = null;
+

@@ -10,5 +10,5 @@ namespace %s;
 
 class %s %s
 {
-
+    %s
 }
