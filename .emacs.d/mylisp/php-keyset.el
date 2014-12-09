@@ -1,6 +1,6 @@
 (require 'gpgkd906-util)
 
-(defun defVar (&rest args)
+(defun defineProperty (&rest args)
   (if (not (setq name (car args)))
       (setq name (read-string "auto generate var define, Input var name :")))
   (if (not (setq template (cadr args)))
@@ -9,7 +9,7 @@
   (mapconcat 'identity 
 	     (mapcar '(lambda (var) (format template var var)) tuple) ""))
 
-(defun defAccessor (&rest args)
+(defun defineAccessor (&rest args)
   (if (not (setq name (car args)))
       (setq name (read-string "auto generate accessor define, Input accessor name :")))
   (if (not (setq template (cadr args)))
@@ -18,9 +18,9 @@
   (mapconcat 'identity 
 	     (mapcar '(lambda (name) 
 			(setq upname (upcase-initials name))
-			(format template name name name name upname name name name name upname name name)) tuple) ""))
+			(format template name name name name upname name name name name upname name)) tuple) ""))
 
-(defun defFunc (&rest args)
+(defun defineFunction (&rest args)
   (if (not (setq name (car args)))
       (setq name (read-string "auto generate function define, Input function name :")))
   (if (not (setq template (cadr args)))
@@ -29,7 +29,7 @@
   (mapconcat 'identity 
 	     (mapcar '(lambda (func) (format template func func)) tuple) ""))
 
-(defun defClass (&rest args)
+(defun defineClass (&rest args)
   (if (not (setq name (car args)))
       (setq name (upcase-initials (read-string "class define, Input class name :"))))
   (if (not (setq extend (cadr args)))
@@ -48,7 +48,7 @@
   (setq class-namespace (replace-regexp-in-string (format ".%s$" class-name) "" name))
   (format template class-name (format-time-string "%Y") user-full-name class-namespace class-name class-extend classbody))
 
-(defun defPackage (&rest args) 
+(defun definePackage (&rest args) 
   (if (not (setq name (car args)))
       (setq name (read-string "auto generate package define, Input package name :")))
   (if (not (setq template (cadr args)))
@@ -73,13 +73,13 @@
 	      (setq var-name (read-string "input vars :"))
 	      (insert (format dumpvar-template var-name)))
   
-  (mylisp-set-key "C-: C-p" (insert (defVar nil var-template)))
+  (mylisp-set-key "C-: C-p" (insert (defineProperty nil var-template)))
   
-  (mylisp-set-key "C-: C-o" (insert (defFunc nil function-template)))
+  (mylisp-set-key "C-: C-o" (insert (defineFunction nil function-template)))
 
-  (mylisp-set-key "C-: C-a" (insert (defAccessor nil accessor-template)))
+  (mylisp-set-key "C-: C-a" (insert (defineAccessor nil accessor-template)))
   
-  (mylisp-set-key "C-: C-;" (insert (defClass nil nil nil class-template package-template)))
+  (mylisp-set-key "C-: C-;" (insert (defineClass nil nil nil class-template package-template)))
   
   (mylisp-set-key "C-: C-:"
 	      (let ((inputed-tuple (split-string (read-string "insert for (v[ar]/a[ccessor]/f[unc]/c[lass]/p[ackage])[:name]? ") ":")))
@@ -88,19 +88,19 @@
 		(cond ((null name)
 		       ;default: defClass
 		       (setq name mode)
-		       (insert (defPackage name package-template))
-		       (insert (defClass name nil nil class-template package-template)))
+		       (insert (definePackage name package-template))
+		       (insert (defineClass name nil nil class-template package-template)))
 		      ((equal mode "v")
-		       (insert (defVar name var-template)))
+		       (insert (defineProperty name var-template)))
 		      ((equal mode "f")
-		       (insert (defFunc name function-template)))		       
+		       (insert (defineFunction name function-template)))		       
 		      ((equal mode "a")
-		       (insert (defAccessor name accessor-template)))
+		       (insert (defineAccessor name accessor-template)))
 		      ((equal mode "c")
-		       (insert (defPackage name package-template))
-		       (insert (defClass name nil nil class-template package-template)))
+		       (insert (definePackage name package-template))
+		       (insert (defineClass name nil nil class-template package-template)))
 		      ((equal mode "p")
-		       (insert (defPackage name package-template)))
+		       (insert (definePackage name package-template)))
 		      (t nil))))
   
   )

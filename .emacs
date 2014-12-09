@@ -5,6 +5,8 @@
  company-mail-address ""
  user-mybin "~/mybin/"
  github-account "gpgkd906"
+ ;do we have org-mode?
+ org-log-done 'time
  )
 ;;check link -P
 (setq inferior-lisp-program "gcl")
@@ -22,9 +24,9 @@
 (require 'gpgkd906-util)
 ;;install-elisp
 (require 'install-elisp)
+(setq install-elisp-repository-directory "~/.emacs.d/")
 ;;enable sqlite support
 (require 'sqlite)
-(setq install-elisp-repository-directory "~/.emacs.d/")
 ;;extend my php-keyset
 (add-hook 'php-mode-hook 
 	  (lambda ()

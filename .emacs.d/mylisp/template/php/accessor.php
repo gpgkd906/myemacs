@@ -25,7 +25,7 @@
      * @return mixed $%s
      * @link
      */
-    public function get%s ($%s)
+    public function get%s ()
     {
         return $this->%s;
     }
