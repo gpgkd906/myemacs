@@ -2,12 +2,15 @@
 (setq
  user-full-name "Chen Han"
  user-mail-address "gpgkd906@gmail.com"
- company-mail-address "chen@penseur.co.jp"
+ company-mail-address ""
+ user-mybin "~/mybin/"
+ github-account "gpgkd906"
  )
 ;;check link -P
 (setq inferior-lisp-program "gcl")
-(add-to-list 'load-path "~/.emacs.d/")
-(add-to-list 'load-path "~/.emacs.d/mylisp/")
+(add-to-list 'load-path user-emacs-directory)
+(add-to-list 'load-path (expand-file-name "mylisp" user-emacs-directory))
+;;myconfig
 (autoload 'php-mode "php-mode" "Major mode for editing php code." t)
 (autoload 'zephir-mode "zephir-mode" "Major mode for editing zephir code." t)
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
@@ -16,8 +19,11 @@
 (add-to-list 'auto-mode-alist '("\\.zep$" . zephir-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . javascript-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . javascript-mode))
+(require 'gpgkd906-util)
 ;;install-elisp
 (require 'install-elisp)
+;;enable sqlite support
+(require 'sqlite)
 (setq install-elisp-repository-directory "~/.emacs.d/")
 ;;extend my php-keyset
 (add-hook 'php-mode-hook 
