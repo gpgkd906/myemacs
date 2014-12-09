@@ -12,4 +12,5 @@
  * @since
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
+namespace %s;
 

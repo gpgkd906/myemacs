@@ -6,8 +6,6 @@
  * @package 
  * @link 
  */
-namespace %s;
-
 class %s %s
 {
 
