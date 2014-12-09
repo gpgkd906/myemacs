@@ -85,8 +85,11 @@
 	      (let ((inputed-tuple (split-string (read-string "insert for (v[ar]/a[ccessor]/f[unc]/c[lass]/p[ackage])[:name]? ") ":")))
 		(setq mode (car inputed-tuple))
 		(setq name (cadr inputed-tuple))
-		(cond ((null mode)
-		       (message "nothing inputed!"))
+		(cond ((null name)
+		       ;default: defClass
+		       (setq name mode)
+		       (insert (defPackage name package-template))
+		       (insert (defClass name nil nil class-template package-template)))
 		      ((equal mode "v")
 		       (insert (defVar name var-template)))
 		      ((equal mode "f")
