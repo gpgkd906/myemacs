@@ -6,8 +6,7 @@
   (if (not (setq template (cadr args)))
       (file-get-contents template "~/.emacs.d/mylisp/template/php/var.php"))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (var) (format template var var)) tuple) ""))
+  (join "" (mapcar '(lambda (var) (format template var var)) tuple)))
 
 (defun defineAccessor (&rest args)
   (if (not (setq name (car args)))
@@ -15,10 +14,9 @@
   (if (not (setq template (cadr args)))
       (file-get-contents template "~/.emacs.d/mylisp/template/php/accessor.php"))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (name) 
-			(setq upname (upcase-initials name))
-			(format template name name name name upname name name name name upname name)) tuple) ""))
+  (join ""  (mapcar '(lambda (name) 
+		       (setq upname (upcase-initials name))
+		       (format template name name name name upname name name name name upname name)) tuple)))
 
 (defun defineFunction (&rest args)
   (if (not (setq name (car args)))
@@ -26,8 +24,22 @@
   (if (not (setq template (cadr args)))
       (file-get-contents template "~/.emacs.d/mylisp/template/php/function.php"))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (func) (format template func func)) tuple) ""))
+  (join "" (mapcar '(lambda (func) (format template func func)) tuple)))
+
+(defun defineInjection (&rest args)
+  (if (not (setq name (car args)))
+      (setq name (read-string "auto generate injection define, Input injector name :")))
+  (if (not (setq actions (cadr args)))
+      (setq actions (read-string "auto generate injection define, Input actions:")))
+  (if (not (setq template (caddr args)))
+      (file-get-contents template "~/.emacs.d/mylisp/template/php/injection.php"))
+  (if (not (setq accessor-template (cadddr args)))
+      (file-get-contents accessor-template "~/.emacs.d/mylisp/template/php/accessor.php"))
+  (setq uname (upcase-initials name))
+  (setq injection-list (mapcar 
+			'(lambda (action) (format template action uname action))
+			(split-string actions)))
+  (join "" (append (list (defineAccessor name accessor-template)) injection-list)))
 
 (defun defineCrud (&rest args)
   (if (not (setq name (car args)))
@@ -35,10 +47,9 @@
   (if (not (setq template (cadr args)))
       (file-get-contents template "~/.emacs.d/mylisp/template/php/crud.php"))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (func) 
-			(setq func (upcase-initials func)) 
-			(format template func func func func)) tuple) ""))
+  (join "" (mapcar '(lambda (func) 
+		      (setq func (upcase-initials func)) 
+		      (format template func func func func)) tuple)))
 
 (defun defineClass (&rest args)
   (if (not (setq name (car args)))
@@ -62,8 +73,7 @@
   (if (not (setq template (cadr args)))
       (file-get-contents template "~/.emacs.d/mylisp/template/php/require.php"))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (var) (format template var)) tuple) ""))
+  (join "" (mapcar '(lambda (var) (format template var)) tuple)))
 
 (defun defineUsePackage (&rest args)
   (if (not (setq name (car args)))
@@ -73,8 +83,7 @@
   (setq name (replace-regexp-in-string "\s*>\s*" ">" name))
   (setq name (replace-regexp-in-string "\s*as\s*" ">" name))
   (setq tuple (split-string name))
-  (mapconcat 'identity 
-	     (mapcar '(lambda (var) (format template (replace-regexp-in-string ">" " as " var))) tuple) ""))
+  (join "" (mapcar '(lambda (var) (format template (replace-regexp-in-string ">" " as " var))) tuple)))
 
 (defun definePackage (&rest args) 
   (if (not (setq name (car args)))
@@ -95,6 +104,7 @@
   (file-get-contents dumpvar-template "~/.emacs.d/mylisp/template/php/dumpvar.php")
   (file-get-contents accessor-template "~/.emacs.d/mylisp/template/php/accessor.php")
   (file-get-contents crud-template "~/.emacs.d/mylisp/template/php/crud.php")
+  (file-get-contents injection-template "~/.emacs.d/mylisp/template/php/injection.php")
   
   (mylisp-set-key "ESC <C-return>"
 	      (setq objects (read-string "input object or class :"))
@@ -113,9 +123,11 @@
   (mylisp-set-key "C-: C-a" (insert (defineAccessor nil accessor-template)))
   
   (mylisp-set-key "C-: C-;" (insert (defineClass nil nil nil class-template)))
+
+  (mylisp-set-key "C-: C-s" (insert (defineInjection nil nil injection-template accessor-template)))
   
   (mylisp-set-key "C-: C-:"
-	      (let ((inputed-tuple (split-string (read-string "insert for (v[ar]/a[ccessor]/f[unc]/c[lass]/p[ackage])[:name]? ") ":")))
+	      (let ((inputed-tuple (split-string (read-string "insert for (v[ar]/a[ccessor]/f[unc]/c[lass]/p[ackage]/crud/inject)[:name]? ") ":")))
 		(setq mode (car inputed-tuple))
 		(setq name (cadr inputed-tuple))
 		(cond ((null name)
@@ -131,6 +143,8 @@
 		       (insert (defineCrud name crud-template)))
 		      ((equal mode "a")
 		       (insert (defineAccessor name accessor-template)))
+		      ((equal mode "inject")
+		       (insert (defineInjection name nil injection-template accessor-template)))
 		      ((equal mode "c")
 		       (insert (definePackage name package-template))
 		       (insert (defineClass name nil nil class-template)))

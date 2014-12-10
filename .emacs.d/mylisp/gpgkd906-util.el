@@ -1,3 +1,6 @@
+(defmacro join (sperate lst)
+  `(mapconcat 'identity ,lst ,sperate))
+
 (defmacro file-get-contents (var file)
   `(setq ,var 
 	 (with-temp-buffer
@@ -20,16 +23,16 @@
      (cond ((string= name "php") 
 	    (require 'php-keyset) (setq defines (cons "<?php\n" (list (definePackage ,pname)))))
 	   ((string= name "js") (require 'js-keyset))
-	   ((string= name "python") (require 'python-keyset))
-	   ((string= name "ruby") (require 'ruby-keyset))
+	   ((string= name "py") (require 'python-keyset))
+	   ((string= name "rb") (require 'ruby-keyset))
 	   ((string= name "cpp") (require 'cpp-keyset))
-	   ((string= name "golang") (require 'golang-keyset))
+	   ((string= name "go") (require 'golang-keyset))
 	   (t (require 'lisp-keyset)))
      (setq defines (append defines (mapcar #'(lambda (define) (eval define)) ',body-define)))
-     (mapconcat 'identity defines "")))
+     (join "" defines)))
 
 (defun ml-class (cname extend &rest rst)
-  (setq body (mapconcat 'identity rst ""))
+  (setq body (join "" rst))
   (if (not extend)
       (setq extend ""))
   (defineClass cname extend body))
@@ -40,8 +43,10 @@
 (defun ml-cruds (&rest names) (mapconcat 'defineCrud names ""))
 (defun ml-use-package (&rest names) (mapconcat 'defineUsePackage names ""))
 (defun ml-require (&rest names) (mapconcat 'defineRequire names ""))
-
-
+(defun ml-injections (&rest injections) 
+  (mapconcat 
+   '(lambda (injection) (apply 'defineInjection injection)) injections ""))
+  
 (mylisp-set-key "C-: <C-return>" 
 		(setq file (car (find-file-read-args "Expand to which file : /" nil)))
 		(setq current-content (buffer-string))
