@@ -27,6 +27,15 @@
 (setq install-elisp-repository-directory "~/.emacs.d/")
 ;;enable sqlite support
 (require 'sqlite)
+;;emmet
+(require 'emmet-mode)
+(add-hook 'sgml-mode-hook 'emmet-mode)
+(add-hook 'css-mode-hook  'emmet-mode)
+(add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 4))) 
+(eval-after-load "emmet-mode"
+  '(define-key emmet-mode-keymap (kbd "C-j") nil)) 
+(keyboard-translate ?\C-i ?\H-i) 
+(define-key emmet-mode-keymap (kbd "H-i") 'emmet-expand-line) 
 ;;extend my php-keyset
 (add-hook 'php-mode-hook 
 	  (lambda ()
